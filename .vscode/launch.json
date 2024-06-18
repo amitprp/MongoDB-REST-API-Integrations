@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Program",
+        "skipFiles": ["<node_internals>/**"],
+        "program": "${workspaceFolder}/src/index.ts",
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"],
+        "sourceMaps": true,
+        "runtimeExecutable": "/Users/amitprp/.nvm/versions/node/v22.2.0/bin",
+        "runtimeArgs": ["-r", "ts-node/register"]
+      }
+    ]
+  }

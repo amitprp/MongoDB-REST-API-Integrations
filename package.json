@@ -1,0 +1,26 @@
+{
+  "name": "mongodb-rest-api-integrations",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts",
+    "client": "ts-node src/client.ts",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "keywords": [],
+  "description": "",
+  "dependencies": {
+    "@sentry/node": "^8.9.2",
+    "@sentry/profiling-node": "^8.9.2",
+    "axios": "^1.7.2",
+    "fastify": "^4.28.0",
+    "mongoose": "^8.4.3"
+  }
+}
