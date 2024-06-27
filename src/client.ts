@@ -1,5 +1,5 @@
 import { Error } from "mongoose";
-import { invoiceSchema } from '../schemas/invoiceSchema.ts';
+import { postInvoiceSchema } from '../schemas/postInvoiceSchema.ts';
 import MontoInvoiceModel from '../Models/InvoiceModel.ts';
 
 // TypeScript type for MontoInvoice
@@ -16,19 +16,19 @@ type MontoInvoice = {
 
 
 // CONSTANTS
-const PORT = 3000
-const HOST = '0.0.0.0'
+const PORT = process.env.PORT || 3000
+const HOST = process.env.HOST || 'localhost'
 
 async function fetchHello(name: string) {
     try {
-        const response: Response = await fetch(`http://${HOST}:${PORT}/hello?name=World`);
+        const response: Response = await fetch(`http://${HOST}:${PORT}/hello?name=HiThere`);
+        const responseData: JSON = await response.json()
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+            throw new Error(JSON.stringify(responseData))
         }
-        const data = await response.json();
-        console.log('Response:', data);
+        console.log('Response:', responseData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error(error)
       }
 }
 
@@ -36,9 +36,6 @@ async function fetchError() {
   try {
       const response: Response = await fetch(`http://${HOST}:${PORT}/error`);
       console.log(response)
-      // if (!response.ok) {
-      //   throw new Error('Network response was not ok');
-      // }
       const data = await response.json();
       console.log('Response:', data);
     } catch (error) {
@@ -70,7 +67,7 @@ async function createInvoice(data: any) {
 }
 
 
-async function fetchInvoices(filters: Record<string, any>): Promise<MontoInvoice[] | undefined>  {
+async function fetchInvoices(filters: Record<string, any>) {
   try {
     const query = new URLSearchParams(filters).toString();
     const response = await fetch(`http://localhost:3000/invoices?${query}`);
@@ -138,11 +135,11 @@ async function deleteInvoice(invoiceId) {
 
 // Data checks
 const fetchProperties = {
-  portal_name: 'New Data Invoice'
+  portal_name: 'Bill.com'
 }
 
 const invoiceData = {
-  portal_name: 'New Data Invoice',
+  portal_name: 'hiPortal',
   invoice_number: 'INV123',
   buyer: 'John Doe',
   status: 'Approved',
@@ -169,8 +166,7 @@ const updateData = {
 // fetchHello('Amit');
 // fetchError()
 createInvoice(invoiceData)
-const invoice: Promise<MontoInvoice[] | undefined> = fetchInvoices(fetchProperties);
-const id = invoice[0].invoiceId
-console.log(id)
+// fetchInvoices(fetchProperties);
+// console.log(invoice)
 // updateInvoice(invoiceId, updateData);
 // deleteInvoice(invoiceId)

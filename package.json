@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/index.ts'",
-    "client": "nodemon --watch 'src/**/*.ts' --exec 'node --loader ts-node/esm src/client.ts'",
+    "dev": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/index.ts",
+    "client": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/client.ts",
     "build": "tsc"
   },
   "author": "",
@@ -18,8 +18,9 @@
   "keywords": [],
   "description": "",
   "dependencies": {
-    "@sentry/node": "^8.11.0",
-    "@sentry/profiling-node": "^8.9.2",
+    "@sentry/browser": "^8.12.0",
+    "@sentry/node": "^8.12.0",
+    "@sentry/profiling-node": "^8.12.0",
     "ajv": "^8.16.0",
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
