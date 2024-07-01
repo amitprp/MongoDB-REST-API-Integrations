@@ -18,7 +18,7 @@ type MontoInvoice = {
 // CONSTANTS
 const PORT = process.env.PORT || 3000
 const HOST = process.env.HOST || 'localhost'
-const collection = 'invoices'
+const invoicesRoute = 'invoices'
 
 async function fetchHello(name: string) {
     try {
@@ -46,7 +46,7 @@ async function fetchError() {
 
 async function createInvoice(data: any) {
   try {
-    const response = await fetch(`http://localhost:3000/${collection}/add`, {
+    const response = await fetch(`http://localhost:3000/${invoicesRoute}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ async function createInvoice(data: any) {
 }
 async function fetchInvoiceById(invoiceId: string) {
   try {
-    const response = await fetch(`http://localhost:3000/${collection}/get/${invoiceId}`);
+    const response = await fetch(`http://localhost:3000/${invoicesRoute}/${invoiceId}`);
     const data = await response.json();
     console.log('Invoice:', data);
     return data;
@@ -81,8 +81,8 @@ async function fetchInvoiceById(invoiceId: string) {
 async function fetchInvoices(filters: Record<string, any>) {
   try {
     const query = new URLSearchParams(filters).toString();
-    const response = await fetch(`http://localhost:3000/${collection}/get?${query}`);
-    // const response = await fetch(`http://localhost:3000/${collection}/get`);
+    const response = await fetch(`http://localhost:3000/${invoicesRoute}?${query}`);
+    // const response = await fetch(`http://localhost:3000/${invoicesRoute}/get`);
     const data = await response.json()
     // .then ((data: {error?: String; extraParams?: Record <string, any>}) => {
     //   if (data.error) {
@@ -104,7 +104,7 @@ async function fetchInvoices(filters: Record<string, any>) {
 
 async function updateInvoice(invoiceId, updateData) {
   try {
-    const response = await fetch(`http://localhost:3000/${collection}/${invoiceId}`, {
+    const response = await fetch(`http://localhost:3000/${invoicesRoute}/${invoiceId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -118,7 +118,7 @@ async function updateInvoice(invoiceId, updateData) {
     }
 
     const data = await response.json();
-    console.log('Invoice updated successfully:', data);
+    console.log('Invoice updated successfully:', data.body);
   } catch (error) {
     console.error('Error updating invoice:', error.message);
   }
@@ -126,7 +126,7 @@ async function updateInvoice(invoiceId, updateData) {
 
 async function deleteInvoice(invoiceId) {
   try {
-    const response = await fetch(`http://localhost:3000/${collection}/del/${invoiceId}`, {
+    const response = await fetch(`http://localhost:3000/${invoicesRoute}/${invoiceId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -150,7 +150,6 @@ async function deleteInvoice(invoiceId) {
 // Data checks
 const fetchProperties = {
   portal_name: 'Bill.com',
-  h: 'dfd'
 }
 
 const invoiceData = {
@@ -164,7 +163,7 @@ const invoiceData = {
   h: '32'
 };
 
-const invoiceId = '6671659b7a4ab96ca3f0ac74';
+const invoiceId = '6671ad48eecd8f79771f2f33';
 const updateData = {
   portal_name: 'New Portal',
   invoice_number: 'INV-123456',
@@ -173,7 +172,7 @@ const updateData = {
   status: 'Approved',
   invoice_date: '2023-06-25T00:00:00.000Z',
   currency: 'USD',
-  total: 1500.00
+  total: 1500.00,
 };
 
 
@@ -182,7 +181,7 @@ const updateData = {
 // fetchError()
 // createInvoice(invoiceData)
 // fetchInvoiceById(invoiceId);
-fetchInvoices(fetchProperties);
+// fetchInvoices(fetchProperties);
 // console.log(invoice)
-// updateInvoice(invoiceId, updateData);
+updateInvoice(invoiceId, updateData);
 // deleteInvoice(invoiceId)

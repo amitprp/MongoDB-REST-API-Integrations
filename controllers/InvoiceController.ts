@@ -108,9 +108,36 @@ export const deleteInvoice = async (
   }
 };
 
+export const updateInvoice = async (
+  req: FastifyRequest,
+  rep: FastifyReply
+) => {
+  try {
+    const collection = await invoicesCollection();
+    const params = req.params as { id: string };
+    console.log(params);
+    const invoiceId: ObjectId = new ObjectId(params.id);
+    const updateData = req.body as MontoInvoice;
+    console.log(updateData);
+    const result = await collection.updateOne(
+      { _id: invoiceId },
+      { $set: updateData }
+    );
+    console.log('yessss')
+    if (result.modifiedCount === 0) {
+      rep.code(404).send({ error: "Invoice not found" });
+    } else {
+      rep.send({ message: `Invoice updated successfully, new Invoice: ${updateData}` });
+    }
+  } catch (err) {
+    rep.code(500).send({ error: err });
+  }
+}
+
 export default {
   addInvoice,
   deleteInvoice,
   getInvoicesByFilter,
   getInvoiceById,
+  updateInvoice
 };
