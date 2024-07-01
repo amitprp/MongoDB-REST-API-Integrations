@@ -1,8 +1,8 @@
+import Sentry from "../services/sentry.ts";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { getInvoicesCollection } from "../services/mongo.ts";
 import { MontoInvoice, MontoInvoiceGet } from "../types/InvoiceTypes.ts";
 import { ObjectId } from "mongodb";
-import MontoInvoiceModel from "../Models/InvoiceModel.ts";
 
 const invoicesCollection = getInvoicesCollection();
 
@@ -13,6 +13,7 @@ export const addInvoice = async (req: FastifyRequest, reply: FastifyReply) => {
     await collection.insertOne(invoice);
     reply.send(invoice);
   } catch (err) {
+    Sentry.captureException(err);
     reply.code(500).send({ error: err });
   }
 };
@@ -21,7 +22,6 @@ export const getInvoicesByFilter = async (
   req: FastifyRequest,
   reply: FastifyReply
 ) => {
-  console.log('hi')
   try {
     const filters: Record<string, any> = {};
 
@@ -64,8 +64,9 @@ export const getInvoicesByFilter = async (
     const invoices = await collection.find(filters).toArray();
 
     reply.send(invoices);
-  } catch (error) {
-    req.log.error("Error fetching invoices:", error);
+  } catch (err) {
+    Sentry.captureException(err);
+    req.log.error("Error fetching invoices:", err);
     reply.code(500).send({ error: "Internal Server Error" });
   }
 };
@@ -85,6 +86,7 @@ export const getInvoiceById = async (
         reply.send(invoice);
       }
     } catch (err) {
+      Sentry.captureException(err);
       reply.code(500).send({ error: err });
     }
   };
@@ -104,6 +106,7 @@ export const deleteInvoice = async (
       reply.send({ message: `Invoice deleted successfully, id: ${invoiceId}` });
     }
   } catch (err) {
+    Sentry.captureException(err);
     reply.code(500).send({ error: err });
   }
 };
@@ -127,6 +130,7 @@ export const updateInvoice = async (
       rep.send({ message: `Invoice updated successfully, new Invoice: ${updateData}` });
     }
   } catch (err) {
+    Sentry.captureException(err);
     rep.code(500).send({ error: err });
   }
 }

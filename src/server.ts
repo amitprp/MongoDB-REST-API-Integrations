@@ -1,26 +1,9 @@
-import * as Sentry from "@sentry/node";
-import { nodeProfilingIntegration } from "@sentry/profiling-node";
-
-// Import MongoDB native driver
-
-// Initialize Sentry
-Sentry.init({
-  dsn: process.env.SENTRY_DSN,
-  integrations: [nodeProfilingIntegration()],
-  // Performance Monitoring
-  tracesSampleRate: 1.0, //  Capture 100% of the transactions
-
-  // Set sampling rate for profiling - this is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
-});
-
+import Sentry from "../services/sentry.ts";
 import fastify from "fastify";
 import { endpointRoutes } from "../services/routes.ts";
-import { postInvoiceRoute, deleteInvoiceRoute } from "../services/routes.ts";
 import {
   closeMongoConnection,
   connectToMongo,
-  getInvoicesCollection,
 } from "../services/mongo.ts";
 
 // ATTACH EXTRA DATA TO SENTRY - pictures. searchable tags for sorting ( username, portalname )
@@ -44,8 +27,8 @@ const app = fastify({
   },
 });
 
-// After defining all routes
 
+// Sentry Middleware
 Sentry.setupFastifyErrorHandler(app);
 
 // Custom Error Handler
@@ -69,10 +52,8 @@ app.setErrorHandler((error, request, reply) => {
   });
 });
 
-// Sentry Middleware
 
-// GET Routes
-// Define GET endpoint /hello
+// Register all routes
 endpointRoutes.forEach((route) => {
   app.register((app, opts, done) => {
     app.route(route);
@@ -96,6 +77,7 @@ const startServer = async () => {
   }
 };
 
+// Graceful shutdown
 process.on("SIGINT", async () => {
   await closeMongoConnection();
   process.exit(0);
@@ -103,26 +85,3 @@ process.on("SIGINT", async () => {
 
 // Call the startServer function to initiate the server
 startServer();
-// app.get("/hello", async (request, reply) => {
-//   const { name } = request.query as { name: string };
-
-//   if (!name) {
-//     reply.code(400).send({ error: "Name parameter is required" });
-//     return;
-//   }
-
-//   reply.send({ message: `Hello ${name}` });
-// });
-
-// // Define GET endpoint /error
-// app.get("/error", async (request, reply) => {
-//   try {
-//     throw new Error(
-//       "This is a deliberate error for testing Sentry integration"
-//     );
-//   } catch (error) {
-//     Sentry.captureException(error);
-//     request.log.error({ error: "Internal Server Error" });
-//     reply.code(500).send({ error: "Internal Server Error" });
-//   }
-// });

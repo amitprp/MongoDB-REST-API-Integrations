@@ -118,7 +118,7 @@ async function updateInvoice(invoiceId, updateData) {
     }
 
     const data = await response.json();
-    console.log('Invoice updated successfully:', data.body);
+    console.log('Invoice updated successfully:', data);
   } catch (error) {
     console.error('Error updating invoice:', error.message);
   }
@@ -165,7 +165,7 @@ const invoiceData = {
 
 const invoiceId = '6671ad48eecd8f79771f2f33';
 const updateData = {
-  portal_name: 'New Portal',
+  portal_name: 'Bill',
   invoice_number: 'INV-123456',
   po_number: 'PO-987654',
   buyer: 'New Buyer',
