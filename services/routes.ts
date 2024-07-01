@@ -6,6 +6,29 @@ import { getInvoiceByIdSchema, getInvoiceFilterSchema } from "../schemas/getInvo
 import { updateInvoiceSchema } from "../schemas/updateInvoiceSchema.ts";
 import { deleteInvoiceSchema } from "../schemas/deleteInvoiceSchema.ts";
 import * as invoicesController from '../controllers/invoiceController.ts';
+import Sentry from './sentry.ts';
+
+export const getHelloRoute: RouteOptions = {
+    method: 'GET',
+    url: '/hello',
+    handler: async (request, reply) => {
+        reply.send({ hello: 'world' });
+    },
+};
+
+export const getErrorRoute: RouteOptions = {
+    method: 'GET',
+    url: '/error',
+    handler: async (request, reply) => {
+        try{
+            throw new Error('This is a deliberate error for testing Sentry integration');
+        } catch (error) {
+            Sentry.captureException(error);
+            request.log.error({ error: 'Internal Server Error' });
+            reply.code(500).send({ error: 'Internal Server Error' });
+        }
+    },
+};
 
 export const getInvoicesByFilterRoute: RouteOptions = {
     method: 'GET',

@@ -115,15 +115,12 @@ export const updateInvoice = async (
   try {
     const collection = await invoicesCollection();
     const params = req.params as { id: string };
-    console.log(params);
     const invoiceId: ObjectId = new ObjectId(params.id);
     const updateData = req.body as MontoInvoice;
-    console.log(updateData);
     const result = await collection.updateOne(
       { _id: invoiceId },
       { $set: updateData }
     );
-    console.log('yessss')
     if (result.modifiedCount === 0) {
       rep.code(404).send({ error: "Invoice not found" });
     } else {
