@@ -1,5 +1,5 @@
 import { FastifySchema } from "fastify";
-import { MontoInvoiceStatus } from "./enums.ts";
+import { MontoInvoiceStatus } from "../enums/InvoiceEnums.ts";
 
 export const deleteInvoiceSchema: FastifySchema = {
   params: {

@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/index.ts",
+    "dev": "nodemon --exec 'node --loader ts-node/esm --enable-source-maps --env-file=.env src/server.ts'",
     "client": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/client.ts",
     "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
@@ -25,7 +26,6 @@
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.0",
-    "mongoose": "^8.4.3",
-    "nodemon": "^3.1.4"
+    "mongoose": "^8.4.3"
   }
 }

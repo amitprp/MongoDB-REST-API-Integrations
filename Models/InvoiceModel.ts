@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
-import { MontoInvoiceStatus } from '../schemas/enums.ts';
-import {MontoInvoice} from '../schemas/types.ts';
+import { MontoInvoiceStatus } from '../enums/InvoiceEnums.ts';
+import {MontoInvoice} from '../types/InvoiceTypes.ts';
 // Mongoose schema for MontoInvoice
 interface IMontoInvoice extends MontoInvoice, Document { }
 

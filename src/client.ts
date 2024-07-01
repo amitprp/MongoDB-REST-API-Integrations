@@ -18,6 +18,7 @@ type MontoInvoice = {
 // CONSTANTS
 const PORT = process.env.PORT || 3000
 const HOST = process.env.HOST || 'localhost'
+const collection = 'invoices'
 
 async function fetchHello(name: string) {
     try {
@@ -45,7 +46,7 @@ async function fetchError() {
 
 async function createInvoice(data: any) {
   try {
-    const response = await fetch('http://localhost:3000/invoice', {
+    const response = await fetch(`http://localhost:3000/${collection}/add`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,33 +55,46 @@ async function createInvoice(data: any) {
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error(`Error creating invoice: ${response.status}`);
     }
 
     const responseData = await response.json();
     console.log('Invoice created:', responseData);
     return responseData;
   } catch (error) {
-    console.error('Error creating invoice:', error);
+    console.error('Network response was not ok');
+    throw error;
+  }
+}
+async function fetchInvoiceById(invoiceId: string) {
+  try {
+    const response = await fetch(`http://localhost:3000/${collection}/get/${invoiceId}`);
+    const data = await response.json();
+    console.log('Invoice:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching invoice:', error);
     throw error;
   }
 }
 
-
 async function fetchInvoices(filters: Record<string, any>) {
   try {
     const query = new URLSearchParams(filters).toString();
-    const response = await fetch(`http://localhost:3000/invoices?${query}`);
-    const data = response.json()
-    .then ((data: {error?: String; extraParams?: Record <string, any>}) => {
-      if (data.error) {
-        const extraParamsString: string = JSON.stringify(data.extraParams)
-        throw new Error(`Problem with query: ${data.error}: ${extraParamsString}`);
-      } else {
-        console.log('Success:\n', data); // Logs the response data if no error
-        return data
-      }
-    })
+    const response = await fetch(`http://localhost:3000/${collection}/get?${query}`);
+    // const response = await fetch(`http://localhost:3000/${collection}/get`);
+    const data = await response.json()
+    // .then ((data: {error?: String; extraParams?: Record <string, any>}) => {
+    //   if (data.error) {
+    //     const extraParamsString: string = JSON.stringify(data.extraParams)
+    //     throw new Error(`Problem with query: ${data.error}: ${extraParamsString}`);
+    //   } else {
+    //     console.log('Success:\n', data); // Logs the response data if no error
+    //     return data
+    //   }
+    // })
+    
+    console.log('Invoices:', data)
   } catch (error){
     if (error)
     console.error('Error fetching invoices:', error);
@@ -90,7 +104,7 @@ async function fetchInvoices(filters: Record<string, any>) {
 
 async function updateInvoice(invoiceId, updateData) {
   try {
-    const response = await fetch(`http://localhost:3000/invoice/${invoiceId}`, {
+    const response = await fetch(`http://localhost:3000/${collection}/${invoiceId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -112,7 +126,7 @@ async function updateInvoice(invoiceId, updateData) {
 
 async function deleteInvoice(invoiceId) {
   try {
-    const response = await fetch(`http://localhost:3000/invoice/${invoiceId}`, {
+    const response = await fetch(`http://localhost:3000/${collection}/del/${invoiceId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
@@ -135,11 +149,12 @@ async function deleteInvoice(invoiceId) {
 
 // Data checks
 const fetchProperties = {
-  portal_name: 'Bill.com'
+  portal_name: 'Bill.com',
+  h: 'dfd'
 }
 
 const invoiceData = {
-  portal_name: 'hiPortal',
+  portal_name: 'newArcTry',
   invoice_number: 'INV123',
   buyer: 'John Doe',
   status: 'Approved',
@@ -149,7 +164,7 @@ const invoiceData = {
   h: '32'
 };
 
-const invoiceId = '6672ba29ace03ea8d75900d8';
+const invoiceId = '6671659b7a4ab96ca3f0ac74';
 const updateData = {
   portal_name: 'New Portal',
   invoice_number: 'INV-123456',
@@ -165,8 +180,9 @@ const updateData = {
 
 // fetchHello('Amit');
 // fetchError()
-createInvoice(invoiceData)
-// fetchInvoices(fetchProperties);
+// createInvoice(invoiceData)
+// fetchInvoiceById(invoiceId);
+fetchInvoices(fetchProperties);
 // console.log(invoice)
 // updateInvoice(invoiceId, updateData);
 // deleteInvoice(invoiceId)
