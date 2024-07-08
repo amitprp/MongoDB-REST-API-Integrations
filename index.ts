@@ -3,6 +3,10 @@ import * as path from "path";
 import * as fs from "fs";
 import { MontoAuthentication, MontoCredential } from "./types/AuthInterfaces.ts";
 
+const URL = process.env.URL;
+const USERNAME = process.env.USERNAME;
+const PASSWORD = process.env.PASSWORD;
+
 // Sleep function to pause execution for a given amount of time
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -89,8 +93,8 @@ async function getAuthentication(credential: MontoCredential): Promise<MontoAuth
     return { token: cookieData.token };
 }
 
-async function Main(url: string, username: string, password: string) {
-    const credential: MontoCredential = { rootUrl: url, username, password };
+async function Main() {
+    const credential: MontoCredential = { rootUrl: String(URL), username: String(USERNAME), password: String(PASSWORD)};
     const authentication: MontoAuthentication = await getAuthentication(credential);
     console.log(authentication);
 
@@ -139,8 +143,4 @@ async function Main(url: string, username: string, password: string) {
   //   //   await browser.close();
 }
 
-Main(
-  "https://backoffice.dev.montopay.com/",
-  "amitp@montopay.com",
-  "!1XmankidX1!"
-);
+Main();
