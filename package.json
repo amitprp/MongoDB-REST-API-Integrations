@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --exec 'node --loader ts-node/esm --enable-source-maps --env-file=.env src/server.ts'",
     "client": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/client.ts",
+    "testcalls": "node --loader ts-node/esm --enable-source-maps --env-file=.env index.ts",
     "build": "tsc"
   },
   "author": "",
@@ -26,6 +27,8 @@
     "axios": "^1.7.2",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.0",
-    "mongoose": "^8.4.3"
+    "mongoose": "^8.4.3",
+    "puppeteer": "^22.12.1",
+    "puppeteer-extra": "^3.3.6"
   }
 }
