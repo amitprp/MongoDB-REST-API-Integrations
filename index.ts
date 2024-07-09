@@ -18,7 +18,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-class cache {
+export class Cache {
   private cacheData: { [key: string]: { value: any; ttl: number } };
   private SESSION_PATH: string;
 
@@ -42,9 +42,9 @@ class cache {
     return null;
   }
 
-  async set(key: string, token: any, ttl: number) {
+  async set(key: string, token: any, ttl: number = 1000) {
     this.cacheData[key] = { value: token, ttl: ttl };
-    // Save cache data to file
+    // Save Cache data to file
     fs.writeFileSync(
       this.SESSION_PATH,
       JSON.stringify(this.cacheData, null, 2)
@@ -70,11 +70,11 @@ async function getSessionCookie(page): Promise<any | null> {
   return { key, token, ttl };
 }
 
-async function getAuthentication(
+export async function getAuthentication(
   credential: MontoCredential
 ): Promise<MontoAuthentication> {
   const { rootUrl, username, password } = credential;
-  const cacheObj = new cache();
+  const cacheObj = new Cache();
   const token = await cacheObj.get("appSession");
 
   if (token) {
@@ -100,12 +100,13 @@ async function getAuthentication(
   return { token: cookieData.token };
 }
 
-async function getInvoices(
+export async function getInvoices(
   authentication: MontoAuthentication,
   filters?: getAllInvoicesAPIResponseFilter
 ): Promise<any> {
 
   const response = await fetch(
+      // @TODO retrieve value from environment variable
     "https://backoffice.dev.montopay.com/api/monto/fetch_all_invoices?tab=new",
     {
       method: "GET",

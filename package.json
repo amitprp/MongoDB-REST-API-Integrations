@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --loader ts-node/esm --enable-source-maps --test --env-file=.env index.test.ts",
     "dev": "nodemon --exec 'node --loader ts-node/esm --enable-source-maps --env-file=.env src/server.ts'",
     "client": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/client.ts",
     "testcalls": "node --loader ts-node/esm --enable-source-maps --env-file=.env index.ts",
