@@ -1,7 +1,7 @@
 import Sentry from "../services/sentry.ts";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { getInvoicesCollection } from "../services/mongo.ts";
-import { MontoInvoice, MontoInvoiceGet } from "../types/InvoiceTypes.ts";
+import { MontoInvoiceDatabase, MontoInvoiceGet } from "../types/InvoiceTypes.ts";
 import { ObjectId } from "mongodb";
 
 const invoicesCollection = getInvoicesCollection();
@@ -9,7 +9,7 @@ const invoicesCollection = getInvoicesCollection();
 export const addInvoice = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
     const collection = await invoicesCollection();
-    const invoice = req.body as MontoInvoice;
+    const invoice = req.body as MontoInvoiceDatabase;
     await collection.insertOne(invoice);
     reply.send(invoice);
   } catch (err) {
@@ -119,7 +119,7 @@ export const updateInvoice = async (
     const collection = await invoicesCollection();
     const params = req.params as { id: string };
     const invoiceId: ObjectId = new ObjectId(params.id);
-    const updateData = req.body as MontoInvoice;
+    const updateData = req.body as MontoInvoiceDatabase;
     const result = await collection.updateOne(
       { _id: invoiceId },
       { $set: updateData }

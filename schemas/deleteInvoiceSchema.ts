@@ -1,5 +1,5 @@
 import { FastifySchema } from "fastify";
-import { MontoInvoiceStatus } from "../enums/InvoiceEnums.ts";
+import { MontoInvoicePortalStatus } from "../enums/InvoiceEnums.ts";
 
 export const deleteInvoiceSchema: FastifySchema = {
   params: {
@@ -20,7 +20,7 @@ export const deleteInvoiceSchema: FastifySchema = {
         invoice_number: { type: "string" },
         po_number: { type: "string" },
         buyer: { type: "string" },
-        status: MontoInvoiceStatus,
+        status: MontoInvoicePortalStatus,
         invoice_date: { type: "string", format: "date-time" },
         currency: { type: "string" },
         total: { type: "number" },

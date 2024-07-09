@@ -1,7 +1,7 @@
 import { RouteOptions } from 'fastify';
 import MontoInvoiceModel from "../Models/InvoiceModel.ts";
 import { postInvoiceSchema } from "../schemas/postInvoiceSchema.ts";
-import { MontoInvoiceGet, MontoInvoice } from "../types/InvoiceTypes.ts";
+import { MontoInvoiceGet, MontoInvoiceDatabase } from "../types/InvoiceTypes.ts";
 import { getInvoiceByIdSchema, getInvoiceFilterSchema } from "../schemas/getInvoiceFilterSchema.ts";
 import { updateInvoiceSchema } from "../schemas/updateInvoiceSchema.ts";
 import { deleteInvoiceSchema } from "../schemas/deleteInvoiceSchema.ts";

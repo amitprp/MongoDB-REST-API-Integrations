@@ -1,5 +1,5 @@
 import { FastifySchema } from "fastify";
-import { MontoInvoiceStatus } from "../enums/InvoiceEnums.ts";
+import { MontoInvoicePortalStatus } from "../enums/InvoiceEnums.ts";
 
 export const getInvoiceFilterSchema: FastifySchema = {
   querystring: {
@@ -7,7 +7,7 @@ export const getInvoiceFilterSchema: FastifySchema = {
     properties: {
       portal_name: { type: "string" },
       buyer: { type: "string" },
-      status: MontoInvoiceStatus,
+      status: MontoInvoicePortalStatus,
       start_date: { type: "string", format: "date-time" },
       end_date: { type: "string", format: "date-time" },
       min_total: { type: "number" },
@@ -26,7 +26,7 @@ export const getInvoiceFilterSchema: FastifySchema = {
         invoice_number: { type: "string" },
         po_number: { type: "string" },
         buyer: { type: "string" },
-        status: MontoInvoiceStatus,
+        status: MontoInvoicePortalStatus,
         invoice_date: { type: "string", format: "date-time" },
         currency: { type: "string" },
         total: { type: "number" },
@@ -55,7 +55,7 @@ export const getInvoiceByIdSchema: FastifySchema = {
         invoice_number: { type: "string" },
         po_number: { type: "string" },
         buyer: { type: "string" },
-        status: MontoInvoiceStatus,
+        status: MontoInvoicePortalStatus,
         invoice_date: { type: "string", format: "date-time" },
         currency: { type: "string" },
         total: { type: "number" },
@@ -63,3 +63,9 @@ export const getInvoiceByIdSchema: FastifySchema = {
     },
   },
 };
+
+export interface getAllInvoicesAPIResponseFilter {
+  date?: string;
+  portal?: string;
+  status?: string;
+}
