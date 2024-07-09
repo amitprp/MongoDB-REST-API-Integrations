@@ -1,10 +1,17 @@
 import Sentry from "../services/sentry.ts";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { getInvoicesCollection } from "../services/mongo.ts";
-import { MontoInvoiceDatabase, MontoInvoiceGet } from "../types/InvoiceTypes.ts";
+import { MontoInvoiceDatabase, MontoInvoiceGet, MontoInvoiceSite } from "../types/InvoiceTypes.ts";
+import { getInvoices, getAuthentication } from "../index.ts";
 import { ObjectId } from "mongodb";
+import { MontoAuthentication } from "../types/AuthInterfaces.ts";
+import { getAllInvoicesAPIResponseFilter } from "../schemas/getInvoiceFilterSchema.ts";
+import { Cache } from "../services/cache.ts";
+import * as hash from "hash";
+
 
 const invoicesCollection = getInvoicesCollection();
+const cache = new Cache();
 
 export const addInvoice = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
@@ -71,6 +78,63 @@ export const getInvoicesByFilter = async (
   }
 };
 
+export const getAllInvoicesFromAPI = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    let invoices: MontoInvoiceSite[];
+    const {
+      date,
+      portal,
+      status,
+      ...extraParams
+    } = req.query as Partial<getAllInvoicesAPIResponseFilter>;
+
+    if (Object.keys(extraParams).length > 0) {
+      return reply
+        .status(404)
+        .send({ error: "Invalid query parameters", extraParams });
+    }
+
+    const filters: Record<string, any> = {
+      date,
+      portal,
+      status
+    };
+
+
+  
+
+    const key = hash.code("invoices" + JSON.stringify(filters));
+
+    invoices = await cache.get(key)
+
+    if(!invoices) {
+      const authentication: MontoAuthentication = await getAuthentication({
+        rootUrl: process.env.URL || "",
+        username: process.env.USERNAME || "",
+        password: process.env.PASSWORD || "",
+      });
+      
+      invoices = await getInvoices(authentication, filters);
+      await cache.set(key, invoices, 5 * 60 * 1000); // 5 minutes TTL
+      for (let i = 0; i < invoices.length; i++) {
+        const invoice = invoices[i];
+        const collection = await invoicesCollection();
+        const id = new ObjectId(invoice._id);
+        await collection.findOneAndUpdate({ _id: id }, { $set: invoice }, { upsert: true });
+      }
+    }
+    
+    reply.send(invoices);
+    
+  } catch (err) {
+    Sentry.captureException(err);
+    req.log.error("Error fetching invoices:", err);
+    reply.code(500).send({ error: err });
+  }
+};
 export const getInvoiceById = async (
     req: FastifyRequest,
     reply: FastifyReply

@@ -44,6 +44,12 @@ export const getInvoiceByIDRoute: RouteOptions = {
     schema: getInvoiceByIdSchema,
 };
 
+export const getAllInvoicesFromAPI: RouteOptions = {
+    method: 'GET',
+    url: '/invoices/scrape',
+    handler: invoicesController.getAllInvoicesFromAPI,
+};
+
 
 export const postInvoiceRoute: RouteOptions = {
     method: 'POST',
