@@ -1,5 +1,4 @@
 import * as puppeteer from "puppeteer";
-import * as hash from "hash";
 import { Cache } from "./services/cache.ts";
 import {
   MontoAuthentication,
@@ -8,7 +7,7 @@ import {
 import { getAllInvoicesAPIResponseFilter } from "./schemas/getInvoiceFilterSchema.ts";
 import { MontoInvoiceSite } from "./types/InvoiceTypes.ts";
 
-const rootURL = process.env.URL!;
+const URL = process.env.URL!;
 const USERNAME = process.env.USERNAME!;
 const PASSWORD = process.env.PASSWORD!;
 
@@ -20,7 +19,6 @@ function sleep(ms: number): Promise<void> {
 function min(a: number, b: number): number {
   return a < b ? a : b;
 }
-
 
 // Function to save cookies to a file
 async function getSessionCookie(key, page): Promise<any | null> {
@@ -43,9 +41,9 @@ export async function getAuthentication(
   credential: MontoCredential
 ): Promise<MontoAuthentication> {
   const { rootUrl, username, password } = credential;
-  const key = hash.code(username + password);
+  const key = username + password;
   const cacheObj = new Cache();
-  const token = await cacheObj.get("appSession");
+  const token = await cacheObj.get(key);
 
   if (token) {
     return { token };
@@ -80,24 +78,29 @@ export async function getInvoices(
   filters?: getAllInvoicesAPIResponseFilter
 ): Promise<any> {
   const response = await fetch(
-    `${rootURL}/api/monto/fetch_all_invoices?tab=new`,
+    `${URL}api/monto/fetch_all_invoices?tab=new`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         cookie: `appSession=${authentication.token}`,
-        Referer: `${rootURL}/invoices?tab=new`,
+        Referer: `${URL}invoices?tab=new`,
       },
     }
   );
   const data = await response.json();
   const filteredInvoices: getAllInvoicesAPIResponseFilter = data
     .filter((invoiceData: any) => {
-      if (filters?.date) {
-        const invoiceDate = new Date(invoiceData.invoice_date);
-        if (invoiceDate != new Date(filters.date)) {
-          return false;
-        }
+      let start_date, end_date;
+      if (!filters?.start_date) {
+        start_date = 0;
+      } else {start_date = filters.start_date.getTime();}
+      if(!filters?.end_date){
+        end_date = Infinity;
+      } else {end_date = filters.end_date.getTime();}
+      const invoiceDate = new Date(invoiceData.invoice_date).getTime();
+      if (invoiceDate > end_date || invoiceDate < start_date) {
+        return false;
       }
       if (filters?.status) {
         if (invoiceData.status != filters.status) {
@@ -132,21 +135,3 @@ export async function getInvoices(
     });
   return filteredInvoices;
 }
-
-// async function Main() {
-//   const credential: MontoCredential = {
-//     rootUrl: String(URL),
-//     username: String(USERNAME),
-//     password: String(PASSWORD),
-//   };
-//   const authentication: MontoAuthentication = await getAuthentication(
-//     credential
-//   );
-//   console.log(authentication);
-
-//   const invoices: MontoInvoiceSite[] = await getInvoices(authentication);
-//   console.log(invoices);
-
-// }
-
-// Main();

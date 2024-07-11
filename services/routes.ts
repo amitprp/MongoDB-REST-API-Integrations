@@ -37,6 +37,7 @@ export const getInvoicesByFilterRoute: RouteOptions = {
     schema: getInvoiceFilterSchema, 
 
 };
+
 export const getInvoiceByIDRoute: RouteOptions = {
     method: 'GET',
     url: '/invoices/:id',
@@ -44,12 +45,11 @@ export const getInvoiceByIDRoute: RouteOptions = {
     schema: getInvoiceByIdSchema,
 };
 
-export const getAllInvoicesFromAPI: RouteOptions = {
+export const getAllInvoicesFromAPIRoute: RouteOptions = {
     method: 'GET',
-    url: '/invoices/scrape',
     handler: invoicesController.getAllInvoicesFromAPI,
+    url: '/invoices/scrape',
 };
-
 
 export const postInvoiceRoute: RouteOptions = {
     method: 'POST',
@@ -73,6 +73,9 @@ const updateInvoiceRoute: RouteOptions = {
 };
 
 export const endpointRoutes: RouteOptions[] = [
+    getHelloRoute,
+    getErrorRoute,
+    getAllInvoicesFromAPIRoute,
     getInvoiceByIDRoute,
     getInvoicesByFilterRoute,
     postInvoiceRoute,

@@ -35,7 +35,6 @@ export const getInvoiceFilterSchema: FastifySchema = {
   },
 };
 
-
 export const getInvoiceByIdSchema: FastifySchema = {
   querystring: {
     type: "object",
@@ -65,7 +64,8 @@ export const getInvoiceByIdSchema: FastifySchema = {
 };
 
 export interface getAllInvoicesAPIResponseFilter {
-  date?: string;
+  start_date?: Date;
+  end_date?: Date;
   portal?: string;
   status?: string;
 }

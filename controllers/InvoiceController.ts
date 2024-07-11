@@ -1,17 +1,21 @@
 import Sentry from "../services/sentry.ts";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { getInvoicesCollection } from "../services/mongo.ts";
-import { MontoInvoiceDatabase, MontoInvoiceGet, MontoInvoiceSite } from "../types/InvoiceTypes.ts";
-import { getInvoices, getAuthentication } from "../index.ts";
+import {
+  MontoInvoiceDatabase,
+  MontoInvoiceGet,
+  MontoInvoiceSite,
+} from "../types/InvoiceTypes.ts";
+import { getInvoices } from "../index.ts";
 import { ObjectId } from "mongodb";
+import { Authenticator } from "../services/authenticator.ts";
 import { MontoAuthentication } from "../types/AuthInterfaces.ts";
 import { getAllInvoicesAPIResponseFilter } from "../schemas/getInvoiceFilterSchema.ts";
 import { Cache } from "../services/cache.ts";
-import * as hash from "hash";
-
 
 const invoicesCollection = getInvoicesCollection();
 const cache = new Cache();
+const authenticator = new Authenticator();
 
 export const addInvoice = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
@@ -84,12 +88,8 @@ export const getAllInvoicesFromAPI = async (
 ) => {
   try {
     let invoices: MontoInvoiceSite[];
-    const {
-      date,
-      portal,
-      status,
-      ...extraParams
-    } = req.query as Partial<getAllInvoicesAPIResponseFilter>;
+    const { start_date, end_date, portal, status, ...extraParams } =
+      req.query as Partial<getAllInvoicesAPIResponseFilter>;
 
     if (Object.keys(extraParams).length > 0) {
       return reply
@@ -97,38 +97,43 @@ export const getAllInvoicesFromAPI = async (
         .send({ error: "Invalid query parameters", extraParams });
     }
 
-    const filters: Record<string, any> = {
-      date,
-      portal,
-      status
-    };
+    const filters: Record<string, any> = {};
+    if (start_date) filters.start_date = start_date;
+    if (end_date) filters.end_date = end_date;
+    if (portal) filters.portal = portal;
+    if (status) filters.status = status;
 
+    // const filters = req.query as Partial<getAllInvoicesAPIResponseFilter>;
 
-  
+    const key = "invoices" + JSON.stringify(filters);
 
-    const key = hash.code("invoices" + JSON.stringify(filters));
+    invoices = await cache.get(key);
 
-    invoices = await cache.get(key)
-
-    if(!invoices) {
-      const authentication: MontoAuthentication = await getAuthentication({
+    if (!invoices) {
+      await authenticator.setAuthentication({
         rootUrl: process.env.URL || "",
         username: process.env.USERNAME || "",
         password: process.env.PASSWORD || "",
       });
       
+      const authentication: MontoAuthentication = await authenticator.getAuthentication();
+
       invoices = await getInvoices(authentication, filters);
       await cache.set(key, invoices, 5 * 60 * 1000); // 5 minutes TTL
+      const collection = await invoicesCollection();
       for (let i = 0; i < invoices.length; i++) {
         const invoice = invoices[i];
-        const collection = await invoicesCollection();
         const id = new ObjectId(invoice._id);
-        await collection.findOneAndUpdate({ _id: id }, { $set: invoice }, { upsert: true });
+        delete invoice._id;
+        await collection.findOneAndUpdate(
+          { _id: id },
+          { $set: invoice },
+          { upsert: true }
+        );
       }
     }
-    
+
     reply.send(invoices);
-    
   } catch (err) {
     Sentry.captureException(err);
     req.log.error("Error fetching invoices:", err);
@@ -136,25 +141,25 @@ export const getAllInvoicesFromAPI = async (
   }
 };
 export const getInvoiceById = async (
-    req: FastifyRequest,
-    reply: FastifyReply
-  ) => {
-    try {
-      const collection = await invoicesCollection();
-      const params = req.params as { id: string };
-      const invoiceId: ObjectId = new ObjectId(params.id);
-      const invoice = await collection.findOne({ _id: invoiceId });
-      if (!invoice) {
-        reply.code(404).send({ error: "Invoice not found" });
-      } else {
-        reply.send(invoice);
-      }
-    } catch (err) {
-      Sentry.captureException(err);
-      reply.code(500).send({ error: err });
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const collection = await invoicesCollection();
+    const params = req.params as { id: string };
+    const invoiceId: ObjectId = new ObjectId(params.id);
+    const invoice = await collection.findOne({ _id: invoiceId });
+    if (!invoice) {
+      reply.code(404).send({ error: "Invoice not found" });
+    } else {
+      reply.send(invoice);
     }
-  };
-  
+  } catch (err) {
+    Sentry.captureException(err);
+    reply.code(500).send({ error: err });
+  }
+};
+
 export const deleteInvoice = async (
   req: FastifyRequest,
   reply: FastifyReply
@@ -175,10 +180,7 @@ export const deleteInvoice = async (
   }
 };
 
-export const updateInvoice = async (
-  req: FastifyRequest,
-  rep: FastifyReply
-) => {
+export const updateInvoice = async (req: FastifyRequest, rep: FastifyReply) => {
   try {
     const collection = await invoicesCollection();
     const params = req.params as { id: string };
@@ -191,18 +193,21 @@ export const updateInvoice = async (
     if (result.modifiedCount === 0) {
       rep.code(404).send({ error: "Invoice not found" });
     } else {
-      rep.send({ message: `Invoice updated successfully, new Invoice: ${updateData}` });
+      rep.send({
+        message: `Invoice updated successfully, new Invoice: ${updateData}`,
+      });
     }
   } catch (err) {
     Sentry.captureException(err);
     rep.code(500).send({ error: err });
   }
-}
+};
 
 export default {
   addInvoice,
   deleteInvoice,
+  getAllInvoicesFromAPI,
   getInvoicesByFilter,
   getInvoiceById,
-  updateInvoice
+  updateInvoice,
 };
