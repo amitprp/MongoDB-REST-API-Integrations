@@ -1,4 +1,4 @@
-import { MontoInvoicePortalStatus } from "../../enums/InvoiceEnums.ts";
+import { MontoInvoicePortalStatus } from "../enums/InvoiceEnums.ts";
 
 // TypeScript type for MontoInvoice
 export type MontoInvoiceDatabase = {

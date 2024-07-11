@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as crypto from "crypto";
 
 export class Cache {
+  //TODO make a singleton
   private cacheData: { [key: string]: { value: any; ttl: number } };
   private DATA_PATH: string;
 

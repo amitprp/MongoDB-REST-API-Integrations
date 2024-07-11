@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "node --loader ts-node/esm --enable-source-maps --test --env-file=.env index.test.ts",
+    "test": "node --loader ts-node/esm --enable-source-maps --test --env-file=.env tests/index.test.ts",
     "dev": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/server.ts",
     "client": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/client.ts",
     "testcalls": "node --loader ts-node/esm --enable-source-maps --env-file=.env index.ts",

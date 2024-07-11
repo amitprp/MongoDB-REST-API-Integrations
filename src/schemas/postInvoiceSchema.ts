@@ -1,6 +1,6 @@
 import { str } from "ajv";
 import { FastifySchema } from "fastify";
-import { MontoInvoicePortalStatus } from "../../enums/InvoiceEnums.ts";
+import { MontoInvoicePortalStatus } from "../enums/InvoiceEnums.ts";
 
 
 export const postInvoiceSchema: FastifySchema = {
