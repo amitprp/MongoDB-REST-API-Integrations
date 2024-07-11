@@ -1,9 +1,7 @@
-import { str } from "ajv";
 import { FastifySchema } from "fastify";
-import { MontoInvoicePortalStatus } from "../enums/InvoiceEnums.ts";
+import { MontoInvoicePortalStatus } from "../../enums/InvoiceEnums.ts";
 
-
-export const postInvoiceSchema: FastifySchema = {
+export const updateInvoiceSchema: FastifySchema = {
   body: {
     type: "object",
     properties: {
@@ -25,7 +23,14 @@ export const postInvoiceSchema: FastifySchema = {
       "currency",
       "total",
     ],
-    additionalProperties: true,
+    additionalProperties: false,
+  },
+  params: {
+    type: "object",
+    properties: {
+      id: { type: "string", pattern: "^[0-9a-fA-F]{24}$" }, // Assuming MongoDB ObjectId
+    },
+    required: ["id"],
   },
   response: {
     200: {
@@ -38,7 +43,7 @@ export const postInvoiceSchema: FastifySchema = {
         po_number: { type: "string" },
         buyer: { type: "string" },
         status: MontoInvoicePortalStatus,
-        invoice_date: { type: "string", format: "date-time"},
+        invoice_date: { type: "string", format: "date-time" },
         currency: { type: "string" },
         total: { type: "number" },
       },

@@ -1,10 +1,10 @@
-import Sentry from "../services/sentry.ts";
+import Sentry from "./services/sentry.ts";
 import fastify from "fastify";
-import { endpointRoutes } from "../services/routes.ts";
+import { endpointRoutes } from "./api/routes/invoiceAPIRoutes.ts";
 import {
   closeMongoConnection,
   connectToMongo,
-} from "../services/mongo.ts";
+} from "./services/mongo.ts";
 
 // ATTACH EXTRA DATA TO SENTRY - pictures. searchable tags for sorting ( username, portalname )
 // ATTACH sequence that made me go to the error ( response and other data )

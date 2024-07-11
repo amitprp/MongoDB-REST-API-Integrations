@@ -1,6 +1,4 @@
 import { Error } from "mongoose";
-import { postInvoiceSchema } from '../schemas/postInvoiceSchema.ts';
-import MontoInvoiceModel from '../Models/InvoiceModel.ts';
 
 // TypeScript type for MontoInvoice
 type MontoInvoice = {

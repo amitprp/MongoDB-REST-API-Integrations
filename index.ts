@@ -1,11 +1,11 @@
 import * as puppeteer from "puppeteer";
-import { Cache } from "./services/cache.ts";
+import { Cache } from "./src/services/cache.ts";
 import {
   MontoAuthentication,
   MontoCredential,
-} from "./types/AuthInterfaces.ts";
-import { getAllInvoicesAPIResponseFilter } from "./schemas/getInvoiceFilterSchema.ts";
-import { MontoInvoiceSite } from "./types/InvoiceTypes.ts";
+} from "./src/types/AuthInterfaces.ts";
+import { getAllInvoicesAPIResponseFilter } from "./src/schemas/getInvoiceFilterSchema.ts";
+import { MontoInvoiceSite } from "./src/types/InvoiceTypes.ts";
 
 const URL = process.env.URL!;
 const USERNAME = process.env.USERNAME!;

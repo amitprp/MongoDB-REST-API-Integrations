@@ -1,12 +1,10 @@
 import { RouteOptions } from 'fastify';
-import MontoInvoiceModel from "../Models/InvoiceModel.ts";
-import { postInvoiceSchema } from "../schemas/postInvoiceSchema.ts";
-import { MontoInvoiceGet, MontoInvoiceDatabase } from "../types/InvoiceTypes.ts";
-import { getInvoiceByIdSchema, getInvoiceFilterSchema } from "../schemas/getInvoiceFilterSchema.ts";
-import { updateInvoiceSchema } from "../schemas/updateInvoiceSchema.ts";
-import { deleteInvoiceSchema } from "../schemas/deleteInvoiceSchema.ts";
-import * as invoicesController from '../controllers/invoiceController.ts';
-import Sentry from './sentry.ts';
+import { postInvoiceSchema } from "../../schemas/postInvoiceSchema.ts";
+import { getInvoiceByIdSchema, getInvoiceFilterSchema } from "../../schemas/getInvoiceFilterSchema.ts";
+import { updateInvoiceSchema } from "../../schemas/updateInvoiceSchema.ts";
+import { deleteInvoiceSchema } from "../../schemas/deleteInvoiceSchema.ts";
+import * as invoicesController from '../controllers/InvoiceController.ts';
+import Sentry from '../../services/sentry.ts';
 
 export const getHelloRoute: RouteOptions = {
     method: 'GET',

@@ -11,5 +11,5 @@
     "noEmit": true,
     "sourceMap": true,
   },
-  "include": ["src", "services"],
+  "include": ["src", "src/services", "tests/client.ts", "schemas", "enums"],
 }

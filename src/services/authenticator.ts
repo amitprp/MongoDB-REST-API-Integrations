@@ -1,11 +1,9 @@
 import * as puppeteer from "puppeteer";
-import { Cache } from "../services/cache.ts";
+import { Cache } from "./cache.ts";
 import {
   MontoAuthentication,
   MontoCredential,
 } from "../types/AuthInterfaces.ts";
-import { getAllInvoicesAPIResponseFilter } from "../schemas/getInvoiceFilterSchema.ts";
-import { MontoInvoiceSite } from "../types/InvoiceTypes.ts";
 import * as utils from "./utils.ts";
 
 export class Authenticator {
