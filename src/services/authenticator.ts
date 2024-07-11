@@ -19,7 +19,7 @@ export class Authenticator {
     this.rootUrl = rootUrl;
     this.username = username;
     this.password = password;
-    this.cache = new Cache();
+    this.cache = Cache.getInstance();
   }
 
   // Function to save cookies to a file
@@ -29,7 +29,7 @@ export class Authenticator {
       (acc, cookie) => {
         if (cookie.name === "appSession") {
           acc.token = cookie.value;
-          acc.ttl = cookie.expires;
+          acc.ttl = cookie.expires - Date.now();
         }
         return acc;
       },

@@ -4,7 +4,7 @@ import { Cache } from "../src/services/cache.ts";
 import { getInvoices } from "../index.ts";
 import { Authenticator } from "../src/services/authenticator.ts";
 
-const cache = new Cache();
+const cache = Cache.getInstance();
 
 const credentials = {
   rootUrl: process.env.URL!,
@@ -20,10 +20,10 @@ function sleep(ms: number): Promise<void> {
 describe("Cache Utility", () => {
   const key = "test_key";
   const value = { foo: "bar" };
-  const ttl = 3000;
+  const ttl = 5 * 60 * 1000;
 
   it("Should set a cache key", async () => {
-    assert.doesNotThrow(async () => cache.set(key, value, ttl));
+    assert.doesNotThrow(async () => await cache.set(key, value, ttl));
   });
 
   it("Should retrieve a cache key", async () => {
@@ -32,8 +32,9 @@ describe("Cache Utility", () => {
   });
 
   it("Should retrieve an expired cache key", async () => {
-    await cache.set(key, value, ttl);
-    await sleep(ttl);
+    const ttlTest = 3000;
+    await cache.set(key, value, ttlTest);
+    await sleep(ttlTest);
     const cacheValue = await cache.get(key);
     assert.deepStrictEqual(cacheValue, null);
   });

@@ -14,7 +14,7 @@ import { getAllInvoicesAPIResponseFilter } from "../../schemas/getInvoiceFilterS
 import { Cache } from "../../services/cache.ts";
 
 const invoicesCollection = getInvoicesCollection();
-const cache = new Cache();
+const cache = Cache.getInstance();
 const authenticator = new Authenticator();
 
 export const addInvoice = async (req: FastifyRequest, reply: FastifyReply) => {

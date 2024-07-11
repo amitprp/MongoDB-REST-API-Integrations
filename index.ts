@@ -42,8 +42,8 @@ export async function getAuthentication(
 ): Promise<MontoAuthentication> {
   const { rootUrl, username, password } = credential;
   const key = username + password;
-  const cacheObj = new Cache();
-  const token = await cacheObj.get(key);
+  const cache = Cache.getInstance();
+  const token = await cache.get(key);
 
   if (token) {
     return { token };
@@ -64,7 +64,7 @@ export async function getAuthentication(
   await page.click('button[type="submit"]');
   await page.waitForNavigation();
   const connectionData = await getSessionCookie(key, page);
-  cacheObj.set(
+  cache.set(
     connectionData.key,
     connectionData.token,
     min(5 * 60 * 1000, connectionData.ttl)
@@ -77,27 +77,28 @@ export async function getInvoices(
   authentication: MontoAuthentication,
   filters?: getAllInvoicesAPIResponseFilter
 ): Promise<any> {
-  const response = await fetch(
-    `${URL}api/monto/fetch_all_invoices?tab=new`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        cookie: `appSession=${authentication.token}`,
-        Referer: `${URL}invoices?tab=new`,
-      },
-    }
-  );
+  const response = await fetch(`${URL}api/monto/fetch_all_invoices?tab=new`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      cookie: `appSession=${authentication.token}`,
+      Referer: `${URL}invoices?tab=new`,
+    },
+  });
   const data = await response.json();
   const filteredInvoices: getAllInvoicesAPIResponseFilter = data
     .filter((invoiceData: any) => {
       let start_date, end_date;
       if (!filters?.start_date) {
         start_date = 0;
-      } else {start_date = filters.start_date.getTime();}
-      if(!filters?.end_date){
+      } else {
+        start_date = filters.start_date.getTime();
+      }
+      if (!filters?.end_date) {
         end_date = Infinity;
-      } else {end_date = filters.end_date.getTime();}
+      } else {
+        end_date = filters.end_date.getTime();
+      }
       const invoiceDate = new Date(invoiceData.invoice_date).getTime();
       if (invoiceDate > end_date || invoiceDate < start_date) {
         return false;

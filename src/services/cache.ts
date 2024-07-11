@@ -3,27 +3,40 @@ import * as fs from "fs";
 import * as crypto from "crypto";
 
 export class Cache {
-  //TODO make a singleton
+  private static instance: Cache;
   private cacheData: { [key: string]: { value: any; ttl: number } };
   private DATA_PATH: string;
 
-  constructor() {
+  private constructor() {
     // Path to the cookie file
-    this.DATA_PATH = path.resolve("./cache.json");
+    // TODO not saving in the cache
+    this.DATA_PATH = path.resolve(process.env.SESSION_FILE!);
     this.cacheData = {};
+  }
+
+  // Cache is a singleton
+  public static getInstance(): Cache {
+    if (!Cache.instance) {
+      Cache.instance = new Cache();
+    }
+    return Cache.instance;
+  }
+
+  async getCacheData(){
+    return Cache.instance.cacheData;
   }
 
   async get(key: string): Promise<any> {
     let cacheEntry;
     const hashedKey = this.hashString(key);
-    if (this.cacheData[hashedKey]) {
-      cacheEntry = this.cacheData[hashedKey];
+    if (this.getCacheData[hashedKey]) {
+      cacheEntry = this.getCacheData[hashedKey];
     } else if (fs.existsSync(this.DATA_PATH)) {
       const appSessionString = await fs.promises.readFile(
         this.DATA_PATH,
         "utf8"
       );
-      cacheEntry = JSON.parse(appSessionString);
+      cacheEntry = JSON.parse(appSessionString)[hashedKey];
     }
     if (cacheEntry && cacheEntry?.ttl > Date.now()) {
       return cacheEntry.value;
@@ -38,7 +51,7 @@ export class Cache {
     try {
       if (fs.existsSync(this.DATA_PATH)) {
         const data = await fs.promises.readFile(this.DATA_PATH, "utf8");
-        this.cacheData = JSON.parse(data);
+        this.getCacheData = JSON.parse(data);
       }
     } catch (error) {
       console.error("Error reading cache data:", error);
@@ -46,13 +59,13 @@ export class Cache {
     }
 
     // Remove expired entries
-    Object.keys(this.cacheData).forEach((key) => {
-      if (this.cacheData[key].ttl < Date.now()) {
-        delete this.cacheData[key];
+    Object.keys(this.getCacheData).forEach((key) => {
+      if (this.getCacheData[key].ttl < Date.now()) {
+        delete this.getCacheData[key];
       }
     });
 
-    this.cacheData[hashedKey] = { value: data, ttl: ttl + Date.now() };
+    this.getCacheData[hashedKey] = { value: data, ttl: ttl + Date.now() };
     // Save Cache data to file
     try {
       await fs.promises.writeFile(
