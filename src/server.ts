@@ -4,7 +4,7 @@ import { endpointRoutes } from "./api/routes/invoiceAPIRoutes.ts";
 import {
   closeMongoConnection,
   connectToMongo,
-} from "./services/mongo.ts";
+} from "./services/mongoDB.ts";
 
 // ATTACH EXTRA DATA TO SENTRY - pictures. searchable tags for sorting ( username, portalname )
 // ATTACH sequence that made me go to the error ( response and other data )

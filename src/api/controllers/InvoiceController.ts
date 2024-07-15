@@ -1,6 +1,6 @@
 import Sentry from "../../services/sentry.ts";
 import { FastifyReply, FastifyRequest } from "fastify";
-import { getInvoicesCollection } from "../../services/mongo.ts";
+import { getInvoicesCollection } from "../../services/mongoDB.ts";
 import {
   MontoInvoiceDatabase,
   MontoInvoiceGet,
