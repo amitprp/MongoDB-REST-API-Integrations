@@ -12,6 +12,10 @@ export class Authenticator {
   private password: string;
   private cache: Cache;
 
+
+  public constructor() {
+    this.cache = null
+  }
   async setAuthentication(
     credential: MontoCredential,
   ): Promise<void> {
@@ -20,6 +24,7 @@ export class Authenticator {
     this.username = username;
     this.password = password;
     this.cache = Cache.getInstance();
+    console.log("Authentication set");
   }
 
   // Function to save cookies to a file
@@ -29,7 +34,7 @@ export class Authenticator {
       (acc, cookie) => {
         if (cookie.name === "appSession") {
           acc.token = cookie.value;
-          acc.ttl = cookie.expires - Date.now();
+          acc.ttl = (cookie.expires * 1000) - Date.now();
         }
         return acc;
       },

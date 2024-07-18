@@ -1,10 +1,9 @@
 import Sentry from "./services/sentry.ts";
 import fastify from "fastify";
 import { endpointRoutes } from "./api/routes/invoiceAPIRoutes.ts";
-import {
-  closeMongoConnection,
-  connectToMongo,
-} from "./services/mongoDB.ts";
+import { MongoDB } from "./services/mongoDB.ts";
+// import { connectToMongo, closeMongoConnection } from "./services/mongoDB.ts";
+import { Cache } from "./services/cache.ts";
 
 // ATTACH EXTRA DATA TO SENTRY - pictures. searchable tags for sorting ( username, portalname )
 // ATTACH sequence that made me go to the error ( response and other data )
@@ -27,6 +26,8 @@ const app = fastify({
   },
 });
 
+const cacheInstance = Cache.getInstance();
+const mongoDBInstance = await MongoDB.getInstance()
 
 // Sentry Middleware
 Sentry.setupFastifyErrorHandler(app);
@@ -69,17 +70,23 @@ const startServer = async () => {
       host: HOST,
     });
     console.log(`Server listening on 'http://${HOST}:${PORT}/'`);
-    connectToMongo();
+    await cacheInstance.init();
+    // await connectToMongo();
+    await mongoDBInstance.connectToMongo();
+    console.log('hi')
   } catch (err) {
     console.error("Error starting Fastify server:", err);
-    await closeMongoConnection();
+    // await closeMongoConnection();
+    await mongoDBInstance.closeMongoConnection();
     process.exit(1);
   }
 };
 
 // Graceful shutdown
 process.on("SIGINT", async () => {
-  await closeMongoConnection();
+  await cacheInstance.saveCache()
+  // await closeMongoConnection();
+  await mongoDBInstance.closeMongoConnection();
   process.exit(0);
 });
 

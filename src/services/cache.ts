@@ -9,7 +9,6 @@ export class Cache {
 
   private constructor() {
     // Path to the cookie file
-    // TODO not saving in the cache
     this.DATA_PATH = path.resolve(process.env.SESSION_FILE!);
     this.cacheData = {};
   }
@@ -22,18 +21,34 @@ export class Cache {
     return Cache.instance;
   }
 
+  async init() {
+    // Loading of Cache Data
+    if (fs.existsSync(this.DATA_PATH)) {
+      const cacheFile = await fs.promises.readFile(this.DATA_PATH, "utf8");
+      Cache.instance.cacheData = cacheFile ? JSON.parse(cacheFile) : {};
+      console.log("Cache Data Loaded");
+    }
+
+    setInterval(async () => {
+      await fs.promises.writeFile(
+        this.DATA_PATH,
+        JSON.stringify(this.cacheData, null, 2)
+      );
+    }, 1000 * 60 * 3);
+  }
+
+  async saveCache(): Promise<any> {
+    await fs.promises.writeFile(
+      this.DATA_PATH,
+      JSON.stringify(this.cacheData, null, 2)
+    );
+  }
 
   async get(key: string): Promise<any> {
     let cacheEntry;
     const hashedKey = this.hashString(key);
     if (this.cacheData[hashedKey]) {
       cacheEntry = this.cacheData[hashedKey];
-    } else if (fs.existsSync(this.DATA_PATH)) {
-      const appSessionString = fs.readFileSync(
-        this.DATA_PATH,
-        "utf8"
-      );
-      cacheEntry = JSON.parse(appSessionString)[hashedKey];
     }
     if (cacheEntry && cacheEntry?.ttl > Date.now()) {
       return cacheEntry.value;
@@ -43,18 +58,6 @@ export class Cache {
 
   async set(key: string, data: any, ttl: number = 1000) {
     const hashedKey = this.hashString(key);
-
-    // Step 1: Read existing cache data
-    try {
-      if (fs.existsSync(this.DATA_PATH)) {
-        const data = fs.readFileSync(this.DATA_PATH, "utf8");
-        this.cacheData = JSON.parse(data);
-      }
-    } catch (error) {
-      console.error("Error reading cache data:", error);
-      // If the file doesn't exist or there's an error, we start with an empty object
-    }
-
     // Remove expired entries
     Object.keys(this.cacheData).forEach((key) => {
       if (this.cacheData[key].ttl < Date.now()) {
@@ -63,15 +66,6 @@ export class Cache {
     });
 
     this.cacheData[hashedKey] = { value: data, ttl: ttl + Date.now() };
-    // Save Cache data to file
-    try {
-      fs.writeFileSync(
-        this.DATA_PATH,
-        JSON.stringify(this.cacheData, null, 2)
-      );
-    } catch (error) {
-      console.error("Error saving cache data:", error);
-    }
   }
 
   hashString = (str: string): string => {

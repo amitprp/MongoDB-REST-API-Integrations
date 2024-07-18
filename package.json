@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node --loader ts-node/esm --enable-source-maps --test --env-file=.env tests/index.test.ts",
     "dev": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/server.ts",
-    "client": "node --loader ts-node/esm --enable-source-maps --env-file=.env src/client.ts",
+    "client": "node --loader ts-node/esm --enable-source-maps --env-file=.env tests/client.ts",
     "testcalls": "node --loader ts-node/esm --enable-source-maps --env-file=.env index.ts",
     "build": "tsc"
   },

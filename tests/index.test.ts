@@ -1,10 +1,10 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { Cache } from "../src/services/cache.ts";
-import { getInvoices } from "../index.ts";
+import { getInvoices } from "../src/api/controllers/InvoiceController.ts";
 import { Authenticator } from "../src/services/authenticator.ts";
 
-const cache = Cache.getInstance();
+const cache = await Cache.getInstance();
 
 const credentials = {
   rootUrl: process.env.URL!,

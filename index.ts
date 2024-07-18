@@ -42,7 +42,7 @@ export async function getAuthentication(
 ): Promise<MontoAuthentication> {
   const { rootUrl, username, password } = credential;
   const key = username + password;
-  const cache = Cache.getInstance();
+  const cache = await Cache.getInstance();
   const token = await cache.get(key);
 
   if (token) {
@@ -71,68 +71,4 @@ export async function getAuthentication(
   ); // 5 minutes TTL
 
   return { token: connectionData.token };
-}
-
-export async function getInvoices(
-  authentication: MontoAuthentication,
-  filters?: getAllInvoicesAPIResponseFilter
-): Promise<any> {
-  const response = await fetch(`${URL}api/monto/fetch_all_invoices?tab=new`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      cookie: `appSession=${authentication.token}`,
-      Referer: `${URL}invoices?tab=new`,
-    },
-  });
-  const data = await response.json();
-  const filteredInvoices: getAllInvoicesAPIResponseFilter = data
-    .filter((invoiceData: any) => {
-      let start_date, end_date;
-      if (!filters?.start_date) {
-        start_date = 0;
-      } else {
-        start_date = filters.start_date.getTime();
-      }
-      if (!filters?.end_date) {
-        end_date = Infinity;
-      } else {
-        end_date = filters.end_date.getTime();
-      }
-      const invoiceDate = new Date(invoiceData.invoice_date).getTime();
-      if (invoiceDate > end_date || invoiceDate < start_date) {
-        return false;
-      }
-      if (filters?.status) {
-        if (invoiceData.status != filters.status) {
-          return false;
-        }
-      }
-      if (filters?.portal) {
-        if (invoiceData.portal_name != filters.portal) {
-          return false;
-        }
-      }
-      return true;
-    })
-    .map((invoiceData: any) => {
-      const invoice: MontoInvoiceSite = {
-        _id: invoiceData._id,
-        monto_customer: invoiceData.monto_customer,
-        buyer: invoiceData.buyer,
-        portal_name: invoiceData.portal_name,
-        invoice_number: invoiceData.invoice_number,
-        status: invoiceData.status,
-        type: invoiceData.type,
-        monto_backoffice_data: invoiceData.monto_backoffice_data,
-        due_date: invoiceData.due_date,
-        invoice_date: invoiceData.invoice_date,
-        total: invoiceData.total,
-        created_by: invoiceData.created_by,
-        created_time: invoiceData.created_time,
-        is_poc_participant: invoiceData.is_poc_participant,
-      };
-      return invoice;
-    });
-  return filteredInvoices;
 }

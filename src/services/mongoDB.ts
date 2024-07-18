@@ -7,63 +7,70 @@ const DATABASE_NAME = process.env.DATABASE_NAME;
 const INVOICES_COLLECTION = process.env.INVOICES_COLLECTION;
 
 // Initialize Connection
-let db;
-export const mongoClient = new MongoClient(MONGO_URI);
+// let db;
+// export const mongoClient = new MongoClient(MONGO_URI);
 
-export const connectToMongo = async () => {
-  try {
-    await mongoClient.connect();
-    db = mongoClient.db(DATABASE_NAME);
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
+// export const connectToMongo = async () => {
+//   try {
+//     await mongoClient.connect();
+//     db = mongoClient.db(DATABASE_NAME);
+//     console.log("Connected to MongoDB");
+//   } catch (error) {
+//     console.error("MongoDB connection error:", error);
+//   }
+// };
+
+// export const closeMongoConnection = async () => {
+//   console.log("Closing MongoDB connection");
+//   await mongoClient.close();
+// };
+
+// export const getInvoicesCollection = () => {
+//   return async () => db.collection(INVOICES_COLLECTION);
+// };
+
+// export default db;
+export class MongoDB {
+  private static instance: MongoDB;
+  private db: any;
+  private mongoClient: MongoClient;
+
+  private constructor() {
+    // Initialize Connection
+    this.db = null;
+    this.mongoClient = new MongoClient(MONGO_URI);
   }
-};
 
-export const closeMongoConnection = async () => {
-  console.log("Closing MongoDB connection");
-  await mongoClient.close();
-};
+  public static getInstance(): MongoDB {
+    if (!MongoDB.instance) {
+      MongoDB.instance = new MongoDB();
+      // await MongoDB.instance.connectToMongo();
+    }
+    return MongoDB.instance;
+  }
 
-export const getInvoicesCollection = () => {
-  return async () => db.collection(INVOICES_COLLECTION);
-};
+  public async connectToMongo(): Promise<void> {
+    try {
+      await MongoDB.instance.mongoClient.connect();
+      MongoDB.instance.db = MongoDB.instance.mongoClient.db(DATABASE_NAME);
+      console.log("Connected to MongoDB");
+    } catch (error) {
+      console.error("MongoDB connection error:", error);
+    }
+  }
 
-export default db;
-// class MongoDB {
-//   private static instance: MongoDB;
-//   private db: any;
+  public async closeMongoConnection(): Promise<void> {
+    console.log("Closing MongoDB connection");
+    await MongoDB.instance.mongoClient.close();
+  }
 
-//   private constructor() {
-//     // Initialize Connection
-//     this.db = null;
-//   }
+  public async getInvoicesCollection() {
+    if (MongoDB.instance.db) {
+      return MongoDB.instance.db.collection(INVOICES_COLLECTION);
+    } else {
+      return null;
+    }
+  }
+}
 
-//   public static getInstance(): MongoDB {
-//     if (!MongoDB.instance) {
-//       MongoDB.instance = new MongoDB();
-//     }
-//     return MongoDB.instance;
-//   }
-
-//   public async connect(): Promise<void> {
-//     try {
-//       await mongoClient.connect();
-//       this.db = mongoClient.db(DATABASE_NAME);
-//       console.log("Connected to MongoDB");
-//     } catch (error) {
-//       console.error("MongoDB connection error:", error);
-//     }
-//   }
-
-//   public async closeConnection(): Promise<void> {
-//     console.log("Closing MongoDB connection");
-//     await mongoClient.close();
-//   }
-
-//   public getInvoicesCollection() {
-//     return this.db.collection(INVOICES_COLLECTION);
-//   }
-// }
-
-// export default MongoDB.getInstance();
+export default MongoDB.getInstance();

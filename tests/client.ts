@@ -60,8 +60,7 @@ async function createInvoice(data: any) {
     console.log('Invoice created:', responseData);
     return responseData;
   } catch (error) {
-    console.error('Network response was not ok');
-    throw error;
+    console.error(error.message);
   }
 }
 async function fetchInvoiceById(invoiceId: string) {
@@ -177,9 +176,9 @@ const updateData = {
 
 // fetchHello('Amit');
 // fetchError()
-// createInvoice(invoiceData)
+createInvoice(invoiceData)
 // fetchInvoiceById(invoiceId);
 // fetchInvoices(fetchProperties);
 // console.log(invoice)
-updateInvoice(invoiceId, updateData);
+// updateInvoice(invoiceId, updateData);
 // deleteInvoice(invoiceId)
